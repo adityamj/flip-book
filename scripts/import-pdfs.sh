@@ -40,6 +40,7 @@ Options:
   --thumb-width NUM     Thumbnail width in pixels. Default: 300
   --jobs NUM            Parallel workers for page renders/thumbs.
                         Default: detected CPU cores
+  --overwrite-jpgs      Rebuild JPG assets for existing issues without touching markdown.
   --force               Rebuild issues even if already processed.
   --help                Show this message.
 
@@ -48,6 +49,7 @@ Notes:
   - Remaining pages become pages/page-001.jpg, pages/page-002.jpg, ...
   - Matching thumbs are created in thumbs/.
   - Existing processed issues are skipped unless --force is used.
+  - --overwrite-jpgs rebuilds only JPG assets and preserves existing markdown files.
 EOF
 }
 
@@ -139,15 +141,26 @@ process_pdf() {
 
   issue_dir="$magazine_dir/$issue_slug"
 
-  if [ "$FORCE" != "1" ] && is_processed_issue "$issue_dir"; then
-    printf 'Skipping existing issue: %s\n' "$issue_dir"
-    skipped_count=$((skipped_count + 1))
-    return
+  if is_processed_issue "$issue_dir"; then
+    if [ "$FORCE" = "1" ] || [ "$OVERWRITE_JPGS" = "1" ]; then
+      printf 'Rebuilding JPG assets for existing issue: %s\n' "$issue_dir"
+    else
+      printf 'Skipping existing issue: %s\n' "$issue_dir"
+      skipped_count=$((skipped_count + 1))
+      return
+    fi
   fi
 
   printf 'Processing %s -> %s\n' "$pdf_path" "$issue_dir"
 
-  rm -rf "$issue_dir"
+  if [ "$OVERWRITE_JPGS" = "1" ]; then
+    mkdir -p "$issue_dir"
+    rm -rf "$issue_dir/pages" "$issue_dir/thumbs"
+    rm -f "$issue_dir/page-000.jpg"
+  else
+    rm -rf "$issue_dir"
+  fi
+
   mkdir -p "$issue_dir/pages" "$issue_dir/thumbs"
   create_issue_index "$issue_dir/index.md" "$(human_title "$issue_name")"
 
@@ -204,12 +217,23 @@ process_pdf() {
     page_index=$((page_index + 1))
   done < "$render_list"
 
+  printf '  Optimizing full pages as progressive JPEGs...\n'
+  find "$issue_dir" -maxdepth 1 -type f -name 'page-*.jpg' -print0 | xargs -0 -P "$JOBS" -I '{}' sh -c '
+    image_path="$1"
+    mogrify -interlace Plane "$image_path" >/dev/null
+  ' sh '{}'
+
+  find "$issue_dir/pages" -maxdepth 1 -type f -name '*.jpg' -print0 | xargs -0 -P "$JOBS" -I '{}' sh -c '
+    image_path="$1"
+    mogrify -interlace Plane "$image_path" >/dev/null
+  ' sh '{}'
+
   printf '  Building thumbnails with %s workers...\n' "$JOBS"
   find "$issue_dir/thumbs" -maxdepth 1 -type f -name '*.jpg' -print0 | xargs -0 -P "$JOBS" -I '{}' sh -c '
     target_dir="$1"
     width="$2"
     thumb_path="$3"
-    mogrify -path "$target_dir" -resize "${width}x" "$thumb_path" >/dev/null
+    mogrify -path "$target_dir" -resize "${width}x" -interlace Plane "$thumb_path" >/dev/null
   ' sh "$issue_dir/thumbs" "$THUMB_WIDTH" '{}'
 
   cleanup_issue_tmpdir
@@ -226,6 +250,7 @@ CONTENT_ROOT="content/magazines"
 DPI="120"
 THUMB_WIDTH="300"
 FORCE="0"
+OVERWRITE_JPGS="0"
 JOBS="$(default_jobs)"
 
 while [ "$#" -gt 0 ]; do
@@ -257,6 +282,10 @@ while [ "$#" -gt 0 ]; do
     --jobs)
       JOBS="$2"
       shift 2
+      ;;
+    --overwrite-jpgs)
+      OVERWRITE_JPGS="1"
+      shift 1
       ;;
     --force)
       FORCE="1"

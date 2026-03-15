@@ -61,7 +61,7 @@ Behavior:
 
 - first PDF page becomes `page-000.jpg`
 - remaining pages become `pages/page-001.jpg`, `pages/page-002.jpg`, ...
-- thumbs are generated for every page
+- full pages and thumbs are written as progressive JPEGs
 - `_index.md` is created for each magazine if missing
 - already processed issues are skipped unless `--force` is used
 

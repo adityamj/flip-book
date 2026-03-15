@@ -267,7 +267,7 @@ What it does:
 - creates one issue bundle per PDF using the PDF filename as the issue slug
 - renders the first PDF page as `page-000.jpg`
 - renders remaining pages as `pages/page-001.jpg`, `pages/page-002.jpg`, ...
-- creates matching `thumbs/` images
+- creates progressive JPEGs for both pages and matching `thumbs/` images
 - skips issues that are already processed unless `--force` is used
 
 Performance tips:
