@@ -89,6 +89,10 @@ img {
   flex: 1;
 }
 
+.site-main-issue {
+  width: unquote("min(1680px, calc(100% - 24px))");
+}
+
 .site-footer {
   margin-top: 2rem;
   border-top: 1px solid rgba(29, 36, 48, 0.08);
@@ -536,8 +540,8 @@ img {
   justify-content: center;
   min-width: 0;
   align-self: stretch;
-  padding: 1.25rem;
-  overflow: auto;
+  padding: 0.75rem;
+  overflow: hidden;
   background:
     radial-gradient(circle at center, rgba(196, 106, 45, 0.08), transparent 34%),
     linear-gradient(180deg, rgba(255, 250, 242, 0.9), rgba(239, 229, 216, 0.88));
@@ -545,11 +549,10 @@ img {
 }
 
 .flipbook-book {
-  width: unquote("min(calc(100% - 32px), 1414px)");
-  height: auto;
+  width: 1414px;
+  height: 1000px;
   min-width: 0;
   min-height: 0;
-  max-height: calc(100vh - 190px);
   margin: auto;
   aspect-ratio: 1414 / 1000;
   touch-action: pan-y;
@@ -576,6 +579,7 @@ img {
 }
 
 .thumb-toggle,
+.thumbs-close,
 .fullscreen-toggle,
 .nav-button {
   position: absolute;
@@ -604,9 +608,22 @@ img {
   padding: 0 0.9rem;
   background: rgba(36, 54, 74, 0.82);
   color: #fffaf2;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
   z-index: 30;
+}
+
+.thumbs-close {
+  display: none;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 250, 242, 0.96);
+  color: $navy;
+  font-size: 28px;
+  line-height: 1;
+  z-index: 35;
 }
 
 .nav-button {
@@ -622,17 +639,27 @@ img {
 }
 
 .nav-button-prev {
-  left: 1rem;
+  left: 0.65rem;
 }
 
 .nav-button-next {
-  right: 1rem;
+  right: 0.65rem;
+}
+
+@media (min-width: 901px) {
+  .flipbook-viewer {
+    padding: 0.5rem;
+  }
 }
 
 @media (max-width: 900px) and (pointer: coarse) {
   .site-main {
     width: unquote("min(100%, calc(100% - 20px))");
     padding-top: 0.8rem;
+  }
+
+  .site-main-issue {
+    width: unquote("min(100%, calc(100% - 20px))");
   }
 
   .issue-header {
@@ -686,13 +713,19 @@ img {
   .flipbook-thumbs {
     position: fixed;
     inset: 0 auto 0 0;
-    height: 100vh;
-    padding-top: 4.25rem;
+    width: unquote("min(280px, calc(100vw - 56px))");
+    max-width: calc(100vw - 56px);
+    height: 100dvh;
+    padding: 4.25rem 0.5rem 0.5rem;
+    background: $panel;
+    border-radius: 0 18px 18px 0;
     box-shadow: 0 0 24px rgba(0, 0, 0, 0.35);
+    overscroll-behavior: contain;
+    z-index: 45;
   }
 
   .flipbook-thumbs.is-collapsed {
-    transform: translateX(-100%);
+    transform: translateX(unquote("calc(-100% - 12px)"));
   }
 
   .flipbook-viewer {
@@ -702,7 +735,7 @@ img {
   }
 
   .flipbook-book {
-    width: unquote("min(calc(100vw - 56px), 707px)");
+    width: unquote("min(calc(100vw - 28px), 707px)");
     min-width: 0;
     height: auto;
     max-height: calc(100vh - 190px);
@@ -713,6 +746,11 @@ img {
     display: block;
     top: 0.65rem;
     left: 0.65rem;
+    z-index: 50;
+  }
+
+  .thumbs-close {
+    display: block;
   }
 
   .fullscreen-toggle {
@@ -722,6 +760,7 @@ img {
     height: 38px;
     padding: 0 0.75rem;
     font-size: 0.85rem;
+    z-index: 50;
   }
 
   .nav-button {

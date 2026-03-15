@@ -10,6 +10,40 @@ function isCompactFlipbookViewport() {
   return window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches
 }
 
+function usesSinglePageLayout() {
+  return window.matchMedia("(max-width: 760px) and (pointer: coarse)").matches
+}
+
+function getFullscreenElement() {
+  return document.fullscreenElement || document.webkitFullscreenElement || null
+}
+
+function supportsFullscreen(element) {
+  return Boolean(document.fullscreenEnabled || document.webkitFullscreenEnabled || element.requestFullscreen || element.webkitRequestFullscreen)
+}
+
+async function enterFullscreen(element) {
+  if (element.requestFullscreen) {
+    await element.requestFullscreen()
+    return
+  }
+
+  if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen()
+  }
+}
+
+async function exitFullscreen() {
+  if (document.exitFullscreen) {
+    await document.exitFullscreen()
+    return
+  }
+
+  if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen()
+  }
+}
+
 function initThumbObserver(root, thumbImages) {
   if (!("IntersectionObserver" in window)) {
     thumbImages.forEach(loadImage)
@@ -60,9 +94,11 @@ async function initFlipbook(root) {
   const items = Array.isArray(data.items) ? data.items : []
   const thumbsPane = root.querySelector("[data-thumbs]")
   const book = root.querySelector("[data-book]")
+  const viewer = root.querySelector("[data-viewer]")
   const prevButton = root.querySelector("[data-prev]")
   const nextButton = root.querySelector("[data-next]")
   const thumbToggle = root.querySelector("[data-thumb-toggle]")
+  const thumbsClose = root.querySelector("[data-thumbs-close]")
   const fullscreenToggle = root.querySelector("[data-fullscreen-toggle]")
 
   if (!items.length) {
@@ -84,7 +120,7 @@ async function initFlipbook(root) {
       return
     }
 
-    const isFullscreen = document.fullscreenElement === root
+    const isFullscreen = getFullscreenElement() === root
     fullscreenToggle.textContent = isFullscreen ? "Exit full screen" : "View in full screen"
     fullscreenToggle.setAttribute("aria-label", isFullscreen ? "Exit full screen" : "View in full screen")
   }
@@ -92,6 +128,8 @@ async function initFlipbook(root) {
   const pageElements = []
   const thumbImages = []
   let pageFlip
+  let currentPageIndex = 0
+  let isSinglePage = usesSinglePageLayout()
   let touchStartX = null
   let touchStartY = null
 
@@ -112,6 +150,38 @@ async function initFlipbook(root) {
       const image = pageElements[index].querySelector("img")
       loadImage(image)
     }
+  }
+
+  function updateBookFrameSize() {
+    if (!viewer) {
+      return
+    }
+
+    const viewerWidth = viewer.clientWidth
+    const viewerHeight = viewer.clientHeight
+
+    if (!viewerWidth || !viewerHeight) {
+      return
+    }
+
+    const horizontalInset = isSinglePage ? 28 : 72
+    const verticalInset = isSinglePage ? 28 : 18
+    const maxWidth = isSinglePage ? 707 : 1414
+    const maxHeight = 1000
+    const aspectRatio = isSinglePage ? 707 / 1000 : 1414 / 1000
+    const availableWidth = Math.max(198, viewerWidth - horizontalInset)
+    const availableHeight = Math.max(350, viewerHeight - verticalInset)
+
+    let frameWidth = Math.min(maxWidth, availableWidth)
+    let frameHeight = frameWidth / aspectRatio
+
+    if (frameHeight > availableHeight) {
+      frameHeight = Math.min(maxHeight, availableHeight)
+      frameWidth = frameHeight * aspectRatio
+    }
+
+    book.style.width = `${Math.round(frameWidth)}px`
+    book.style.height = `${Math.round(frameHeight)}px`
   }
 
   items.forEach((item, index) => {
@@ -151,36 +221,93 @@ async function initFlipbook(root) {
 
   initThumbObserver(root, thumbImages)
 
-  const isCompactViewport = isCompactFlipbookViewport()
+  function goToPage(index) {
+    if (!pageFlip) {
+      return
+    }
 
-  pageFlip = new window.St.PageFlip(book, {
-    size: "stretch",
-    minWidth: 198,
-    maxWidth: 707,
-    minHeight: 350,
-    maxHeight: 1000,
-    width: 707,
-    height: 1000,
-    usePortrait: isCompactViewport,
-    autoSize: true,
-    showCover: data.showCover !== false,
-    mobileScrollSupport: false,
-  })
+    currentPageIndex = Math.max(0, Math.min(index, pageElements.length - 1))
 
-  pageFlip.loadFromHTML(pageElements)
-  ensurePageImages(0)
+    if (typeof pageFlip.turnToPage === "function") {
+      pageFlip.turnToPage(currentPageIndex)
+      return
+    }
+
+    pageFlip.flip(currentPageIndex)
+  }
+
+  function mountPageFlip(targetPage = 0) {
+    book.replaceChildren(...pageElements)
+    updateBookFrameSize()
+
+    pageFlip = new window.St.PageFlip(book, {
+      size: "stretch",
+      minWidth: 198,
+      maxWidth: 707,
+      minHeight: 350,
+      maxHeight: 1000,
+      width: 707,
+      height: 1000,
+      usePortrait: isSinglePage,
+      autoSize: true,
+      showCover: isSinglePage && data.showCover !== false,
+      mobileScrollSupport: false,
+    })
+
+    pageFlip.loadFromHTML(pageElements)
+    ensurePageImages(targetPage)
+
+    if (targetPage > 0) {
+      goToPage(targetPage)
+    }
+
+    pageFlip.on("flip", (event) => {
+      currentPageIndex = event.data
+      ensurePageImages(event.data)
+    })
+  }
+
+  function syncPageLayout() {
+    const nextSinglePage = usesSinglePageLayout()
+
+    if (!pageFlip || nextSinglePage === isSinglePage) {
+      return
+    }
+
+    let targetPage = currentPageIndex
+
+    if (typeof pageFlip.getCurrentPageIndex === "function") {
+      targetPage = pageFlip.getCurrentPageIndex()
+    }
+
+    if (typeof pageFlip.destroy === "function") {
+      pageFlip.destroy()
+    }
+
+    isSinglePage = nextSinglePage
+    mountPageFlip(targetPage)
+  }
+
+  mountPageFlip(0)
 
   prevButton.addEventListener("click", () => pageFlip.flipPrev())
   nextButton.addEventListener("click", () => pageFlip.flipNext())
   thumbToggle.addEventListener("click", () => thumbsPane.classList.toggle("is-collapsed"))
+  if (thumbsClose) {
+    thumbsClose.addEventListener("click", () => thumbsPane.classList.add("is-collapsed"))
+  }
 
   if (fullscreenToggle) {
+    if (!supportsFullscreen(root)) {
+      fullscreenToggle.hidden = true
+    }
+
     fullscreenToggle.addEventListener("click", async () => {
       try {
-        if (document.fullscreenElement === root) {
-          await document.exitFullscreen()
+        if (getFullscreenElement() === root) {
+          await exitFullscreen()
         } else {
-          await root.requestFullscreen()
+          await enterFullscreen(root)
         }
       } catch (error) {
         console.error("Fullscreen toggle failed", error)
@@ -188,10 +315,18 @@ async function initFlipbook(root) {
     })
 
     document.addEventListener("fullscreenchange", updateFullscreenButton)
+    document.addEventListener("webkitfullscreenchange", updateFullscreenButton)
+    document.addEventListener("fullscreenchange", updateBookFrameSize)
+    document.addEventListener("webkitfullscreenchange", updateBookFrameSize)
     updateFullscreenButton()
   }
 
-  window.addEventListener("resize", syncThumbState)
+  window.addEventListener("resize", () => {
+    updateBookFrameSize()
+    syncThumbState()
+    syncPageLayout()
+  })
+  updateBookFrameSize()
   syncThumbState()
 
   window.addEventListener("keydown", (event) => {
@@ -234,10 +369,6 @@ async function initFlipbook(root) {
       pageFlip.flipPrev()
     }
   }, { passive: true })
-
-  pageFlip.on("flip", (event) => {
-    ensurePageImages(event.data)
-  })
 }
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -52,14 +52,14 @@
     {{ end }}
     <script src="{{ $js.RelPermalink }}" defer {{ if hugo.IsProduction }}integrity="{{ $js.Data.Integrity }}"{{ end }}></script>
   </head>
-  <body>
+  <body class="{{ if eq .Type `issue` }}page-issue{{ else if .IsHome }}page-home{{ else }}page-default{{ end }}">
     {{ $footerCopyright := site.Params.footer.copyright | default (printf "© %d %s" now.Year site.Title) }}
     {{ $footerBlurb := site.Params.footer.blurb | default site.Params.description }}
     <div class="site-shell">
       <header class="site-header">
         <a class="site-title" href="{{ site.Home.RelPermalink }}">{{ site.Title | default "Flipbook Library" }}</a>
       </header>
-      <main class="site-main">
+      <main class="site-main{{ if eq .Type `issue` }} site-main-issue{{ end }}">
         {{ block "main" . }}{{ end }}
       </main>
       <footer class="site-footer">
