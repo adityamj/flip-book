@@ -1,5 +1,9 @@
 {{ define "main" }}
   {{ $library := site.GetPage "section" "magazines" }}
+  {{ $magazines := slice }}
+  {{ with $library }}
+    {{ $magazines = first 5 .Sections.ByWeight }}
+  {{ end }}
 
   <section class="library-header">
     <p class="eyebrow">Library</p>
@@ -11,9 +15,9 @@
     {{ end }}
   </section>
 
-  <section class="library-grid">
+  <section class="library-grid library-grid-magazines">
     {{ with $library }}
-      {{ range .Sections.ByWeight }}
+      {{ range $magazines }}
         {{ partial "flipbook/card.html" . }}
       {{ else }}
         <p class="empty-state">Add sections under `content/magazines/` to populate the library.</p>
@@ -22,4 +26,28 @@
       <p class="empty-state">Create a `content/magazines/` section to start building the library.</p>
     {{ end }}
   </section>
+
+  {{ range $magazines }}
+    {{ $issues := first 5 (.RegularPages.ByDate.Reverse) }}
+    <section class="recent-magazine-section">
+      <div class="recent-magazine-header">
+        <div>
+          <p class="eyebrow">Latest Issues</p>
+          <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+          {{ with .Description }}
+            <p class="library-copy">{{ . }}</p>
+          {{ end }}
+        </div>
+        <a class="section-link-pill" href="{{ .RelPermalink }}">View all issues</a>
+      </div>
+
+      <div class="recent-issues-grid">
+        {{ range $issues }}
+          {{ partial "flipbook/recent-issue-card.html" . }}
+        {{ else }}
+          <p class="empty-state">No issues published here yet.</p>
+        {{ end }}
+      </div>
+    </section>
+  {{ end }}
 {{ end }}

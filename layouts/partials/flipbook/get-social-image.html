@@ -1,0 +1,31 @@
+{{ $page := . }}
+{{ $image := false }}
+
+{{ if eq $page.Type "issue" }}
+  {{ with partial "flipbook/get-issue.html" $page }}
+    {{ if gt (len .items) 0 }}
+      {{ with index .items 0 }}
+        {{ $image = .thumb }}
+      {{ end }}
+    {{ end }}
+    {{ if and (not $image) .cover }}
+      {{ $image = .cover }}
+    {{ end }}
+  {{ end }}
+{{ else if eq $page.Type "magazine" }}
+  {{ $issues := where $page.RegularPagesRecursive "Type" "issue" }}
+  {{ if gt (len $issues) 0 }}
+    {{ $latest := index ($issues.ByDate.Reverse) 0 }}
+    {{ $image = partial "flipbook/get-social-image.html" $latest }}
+  {{ end }}
+{{ else if $page.IsHome }}
+  {{ with site.GetPage "section" "magazines" }}
+    {{ $issues := where .RegularPagesRecursive "Type" "issue" }}
+    {{ if gt (len $issues) 0 }}
+      {{ $latest := index ($issues.ByDate.Reverse) 0 }}
+      {{ $image = partial "flipbook/get-social-image.html" $latest }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ return $image }}

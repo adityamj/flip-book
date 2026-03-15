@@ -1,0 +1,21 @@
+{{ $description := .Description | default .Summary }}
+
+{{ if not $description }}
+  {{ if .IsHome }}
+    {{ $description = site.Params.description | default "Browse the latest magazine issues in a flipbook library built for comfortable reading on desktop and mobile." }}
+  {{ else if eq .Type "magazine" }}
+    {{ $description = printf "Browse issues of %s." .Title }}
+  {{ else if eq .Type "issue" }}
+    {{ with .Date }}
+      {{ $description = printf "%s, published %s." $.Title (.Format "January 2006") }}
+    {{ else }}
+      {{ $description = printf "Read %s." .Title }}
+    {{ end }}
+  {{ else if .IsSection }}
+    {{ $description = printf "Browse %s in the %s archive." (.Title | lower) (site.Title | default "flipbook library") }}
+  {{ else }}
+    {{ $description = printf "Explore %s on %s." .Title (site.Title | default "the site") }}
+  {{ end }}
+{{ end }}
+
+{{ return $description }}

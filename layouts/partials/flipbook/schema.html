@@ -1,0 +1,131 @@
+{{ $page := . }}
+{{ $siteTitle := site.Title | default "Flipbook Library" }}
+{{ $siteDescription := site.Params.description | default "Browse the latest magazine issues in a flipbook library built for comfortable reading on desktop and mobile." }}
+{{ $pageDescription := partial "flipbook/get-social-description.html" $page }}
+{{ $socialImage := partial "flipbook/get-social-image.html" $page }}
+{{ $websiteID := printf "%s#website" site.Home.Permalink }}
+{{ $graph := slice }}
+{{ $imageObject := false }}
+
+{{ with $socialImage }}
+  {{ $imageObject = dict "@type" "ImageObject" "url" .Permalink }}
+  {{ with .Width }}
+    {{ $imageObject = merge $imageObject (dict "width" .) }}
+  {{ end }}
+  {{ with .Height }}
+    {{ $imageObject = merge $imageObject (dict "height" .) }}
+  {{ end }}
+{{ end }}
+
+{{ $website := dict
+  "@type" "WebSite"
+  "@id" $websiteID
+  "url" site.Home.Permalink
+  "name" $siteTitle
+  "description" $siteDescription
+}} 
+{{ with $imageObject }}
+  {{ $website = merge $website (dict "image" .) }}
+{{ end }}
+{{ $graph = $graph | append $website }}
+
+{{ if $page.IsHome }}
+  {{ $pageNode := dict
+    "@type" "WebPage"
+    "@id" (printf "%s#webpage" $page.Permalink)
+    "url" $page.Permalink
+    "name" $siteTitle
+    "description" $pageDescription
+    "isPartOf" (dict "@id" $websiteID)
+  }}
+  {{ with $imageObject }}
+    {{ $pageNode = merge $pageNode (dict "primaryImageOfPage" .) }}
+  {{ end }}
+  {{ $graph = $graph | append $pageNode }}
+{{ else if eq $page.Type "magazine" }}
+  {{ $pageNode := dict
+    "@type" "CollectionPage"
+    "@id" (printf "%s#collectionpage" $page.Permalink)
+    "url" $page.Permalink
+    "name" $page.Title
+    "description" $pageDescription
+    "isPartOf" (dict "@id" $websiteID)
+  }}
+  {{ with $imageObject }}
+    {{ $pageNode = merge $pageNode (dict "primaryImageOfPage" .) }}
+  {{ end }}
+  {{ $graph = $graph | append $pageNode }}
+{{ else if eq $page.Type "issue" }}
+  {{ $pageNode := dict
+    "@type" "Article"
+    "@id" (printf "%s#article" $page.Permalink)
+    "mainEntityOfPage" (dict "@type" "WebPage" "@id" $page.Permalink)
+    "url" $page.Permalink
+    "headline" $page.Title
+    "name" $page.Title
+    "description" $pageDescription
+    "publisher" (dict "@type" "Organization" "name" $siteTitle)
+  }}
+  {{ with $page.Date }}
+    {{ $pageNode = merge $pageNode (dict "datePublished" (.Format "2006-01-02T15:04:05Z07:00")) }}
+  {{ end }}
+  {{ with $page.Lastmod }}
+    {{ $pageNode = merge $pageNode (dict "dateModified" (.Format "2006-01-02T15:04:05Z07:00")) }}
+  {{ end }}
+  {{ with $page.Parent }}
+    {{ $pageNode = merge $pageNode (dict "isPartOf" (dict "@id" (printf "%s#collectionpage" .Permalink) "name" .Title)) }}
+  {{ else }}
+    {{ $pageNode = merge $pageNode (dict "isPartOf" (dict "@id" $websiteID)) }}
+  {{ end }}
+{{ with $imageObject }}
+    {{ $pageNode = merge $pageNode (dict "image" . "thumbnailUrl" (index . "url")) }}
+  {{ end }}
+  {{ with partial "flipbook/get-issue.html" $page }}
+    {{ $pageNode = merge $pageNode (dict "pagination" (printf "%d pages" .count)) }}
+  {{ end }}
+  {{ $graph = $graph | append $pageNode }}
+{{ end }}
+
+{{ if not $page.IsHome }}
+  {{ $breadcrumbItems := slice (dict
+    "@type" "ListItem"
+    "position" 1
+    "name" "Home"
+    "item" site.Home.Permalink
+  ) }}
+  {{ if eq $page.Type "magazine" }}
+    {{ $breadcrumbItems = $breadcrumbItems | append (dict
+      "@type" "ListItem"
+      "position" 2
+      "name" $page.Title
+      "item" $page.Permalink
+    ) }}
+  {{ else if eq $page.Type "issue" }}
+    {{ with $page.Parent }}
+      {{ $breadcrumbItems = $breadcrumbItems | append (dict
+        "@type" "ListItem"
+        "position" 2
+        "name" .Title
+        "item" .Permalink
+      ) }}
+    {{ end }}
+    {{ $breadcrumbItems = $breadcrumbItems | append (dict
+      "@type" "ListItem"
+      "position" (add (len $breadcrumbItems) 1)
+      "name" $page.Title
+      "item" $page.Permalink
+    ) }}
+  {{ end }}
+  {{ if gt (len $breadcrumbItems) 1 }}
+    {{ $graph = $graph | append (dict
+      "@type" "BreadcrumbList"
+      "@id" (printf "%s#breadcrumb" $page.Permalink)
+      "itemListElement" $breadcrumbItems
+    ) }}
+  {{ end }}
+{{ end }}
+
+{{ if gt (len $graph) 0 }}
+  {{ $schema := dict "@context" "https://schema.org" "@graph" $graph | jsonify }}
+  {{ printf `<script type="application/ld+json">%s</script>` $schema | safeHTML }}
+{{ end }}

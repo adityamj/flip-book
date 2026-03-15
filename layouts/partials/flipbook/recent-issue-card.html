@@ -1,0 +1,29 @@
+{{ $cover := partial "flipbook/get-card-cover.html" . }}
+{{ $issue := partial "flipbook/get-issue.html" . }}
+
+<article class="recent-issue-card">
+  <a class="recent-issue-link" href="{{ .RelPermalink }}">
+    <div class="recent-issue-media">
+      {{ with $cover }}
+        {{ $thumb := .Fit "240x320" }}
+        <img src="{{ $thumb.RelPermalink }}" alt="{{ $.Title }} cover" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" />
+      {{ else }}
+        <div class="library-card-placeholder">No cover yet</div>
+      {{ end }}
+    </div>
+    <div class="recent-issue-body">
+      <p class="recent-issue-date">{{ with .Date }}{{ .Format "Jan 2006" }}{{ end }}</p>
+      <h3>{{ .Title }}</h3>
+      {{ with .Description }}
+        <p class="recent-issue-copy">{{ . }}</p>
+      {{ else }}
+        {{ with .Summary }}
+          <p class="recent-issue-copy">{{ . }}</p>
+        {{ end }}
+      {{ end }}
+      {{ with $issue }}
+        <span class="recent-issue-meta">{{ .count }} pages</span>
+      {{ end }}
+    </div>
+  </a>
+</article>

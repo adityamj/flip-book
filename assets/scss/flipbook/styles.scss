@@ -197,6 +197,154 @@ img {
   justify-content: center;
 }
 
+.library-grid-magazines {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 280px));
+  align-items: start;
+}
+
+.library-grid-magazines .library-card-link {
+  max-width: 280px;
+  margin-inline: auto;
+}
+
+.library-grid-magazines .library-card-media {
+  aspect-ratio: 210 / 297;
+}
+
+.library-grid-magazines .library-card-body {
+  padding: 1.15rem 1.15rem 1.25rem;
+}
+
+.library-grid-magazines .library-card-body h2 {
+  font-size: 1.35rem;
+}
+
+.library-grid-magazines .library-card-cta {
+  padding: 0.72rem 0.95rem;
+}
+
+.recent-magazine-section {
+  margin-top: 3rem;
+}
+
+.recent-magazine-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid $line;
+}
+
+.recent-magazine-header h2 {
+  margin: 0;
+  font-family: $font-sans;
+  font-size: clamp(1.5rem, 2.2vw, 2.25rem);
+  line-height: 1.08;
+}
+
+.recent-magazine-header h2 a:hover {
+  color: $accent;
+}
+
+.section-link-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(36, 54, 74, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.72);
+  color: $navy;
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 12px 28px rgba(34, 30, 22, 0.08);
+}
+
+.section-link-pill:hover {
+  color: $accent;
+  border-color: rgba(196, 106, 45, 0.28);
+  background: rgba(196, 106, 45, 0.08);
+}
+
+.recent-issues-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 220px));
+  gap: 1.15rem;
+  justify-content: start;
+}
+
+.recent-issue-card {
+  min-width: 0;
+}
+
+.recent-issue-link {
+  display: grid;
+  height: 100%;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid rgba(29, 36, 48, 0.08);
+  border-radius: 20px;
+  background: rgba(255, 250, 242, 0.9);
+  color: $text;
+  box-shadow: 0 18px 36px rgba(34, 30, 22, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.recent-issue-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(196, 106, 45, 0.28);
+  box-shadow: 0 24px 42px rgba(34, 30, 22, 0.14);
+}
+
+.recent-issue-media {
+  aspect-ratio: 210 / 297;
+  background: linear-gradient(180deg, #f0e2d0 0%, #e6d5c0 100%);
+}
+
+.recent-issue-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recent-issue-body {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.9rem 0.95rem 1rem;
+}
+
+.recent-issue-date,
+.recent-issue-meta {
+  margin: 0;
+  color: $muted;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.recent-issue-body h3 {
+  margin: 0;
+  font-family: $font-sans;
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+
+.recent-issue-copy {
+  margin: 0;
+  color: $muted;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .library-card {
   min-width: 0;
 }
@@ -335,7 +483,9 @@ img {
 
 .flipbook-shell {
   display: flex;
-  height: unquote("min(88vh, 1100px)");
+  align-items: flex-start;
+  position: relative;
+  min-height: unquote("min(88vh, 1100px)");
   border-radius: 24px;
   overflow: hidden;
   border: 1px solid rgba(29, 36, 48, 0.08);
@@ -343,15 +493,27 @@ img {
   box-shadow: 0 36px 70px rgba(37, 32, 24, 0.15);
 }
 
+.flipbook-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--thumb-panel-width, 160px);
+  border-radius: 24px 0 0 24px;
+  background: $panel;
+  z-index: 0;
+}
+
 .flipbook-thumbs {
   width: var(--thumb-panel-width, 160px);
-  height: 100%;
+  height: unquote("min(88vh, 1100px)");
+  min-height: 0;
   flex: 0 0 var(--thumb-panel-width, 160px);
+  align-self: stretch;
   overflow-y: auto;
   padding: 0.5rem;
-  background: $panel;
+  background: transparent;
   transition: transform 0.25s ease;
-  z-index: 20;
+  z-index: 1;
 }
 
 .flipbook-thumbs img {
@@ -369,21 +531,26 @@ img {
   position: relative;
   display: flex;
   flex: 1;
-  height: 100%;
+  min-height: unquote("min(88vh, 1100px)");
   align-items: center;
   justify-content: center;
   min-width: 0;
-  padding: 1rem;
-  overflow: hidden;
+  align-self: stretch;
+  padding: 1.25rem;
+  overflow: auto;
   background:
     radial-gradient(circle at center, rgba(196, 106, 45, 0.08), transparent 34%),
     linear-gradient(180deg, rgba(255, 250, 242, 0.9), rgba(239, 229, 216, 0.88));
+  z-index: 1;
 }
 
 .flipbook-book {
-  width: unquote("min(calc(100% - 120px), 1414px)");
+  width: unquote("min(calc(100% - 32px), 1414px)");
   height: auto;
-  max-height: calc(100vh - 180px);
+  min-width: 0;
+  min-height: 0;
+  max-height: calc(100vh - 190px);
+  margin: auto;
   aspect-ratio: 1414 / 1000;
   touch-action: pan-y;
 }
@@ -462,7 +629,7 @@ img {
   right: 1rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .site-main {
     width: unquote("min(100%, calc(100% - 20px))");
     padding-top: 0.8rem;
@@ -471,6 +638,19 @@ img {
   .issue-header {
     align-items: start;
     flex-direction: column;
+  }
+
+  .recent-magazine-header {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .recent-issues-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  .section-link-pill {
+    width: 100%;
   }
 
   .issue-meta {
@@ -493,7 +673,14 @@ img {
 
   .flipbook-shell {
     position: relative;
+    align-items: stretch;
     height: calc(100vh - 180px);
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .flipbook-shell::before {
+    display: none;
   }
 
   .flipbook-thumbs {
@@ -510,10 +697,14 @@ img {
 
   .flipbook-viewer {
     padding: 0.65rem 0.5rem;
+    overflow: hidden;
+    min-height: 100%;
   }
 
   .flipbook-book {
     width: unquote("min(calc(100vw - 56px), 707px)");
+    min-width: 0;
+    height: auto;
     max-height: calc(100vh - 190px);
     aspect-ratio: 707 / 1000;
   }

@@ -6,6 +6,10 @@ function loadImage(img) {
   img.src = img.dataset.src
 }
 
+function isCompactFlipbookViewport() {
+  return window.matchMedia("(max-width: 900px) and (pointer: coarse)").matches
+}
+
 function initThumbObserver(root, thumbImages) {
   if (!("IntersectionObserver" in window)) {
     thumbImages.forEach(loadImage)
@@ -92,7 +96,7 @@ async function initFlipbook(root) {
   let touchStartY = null
 
   function syncThumbState() {
-    if (window.innerWidth <= 900) {
+    if (isCompactFlipbookViewport()) {
       thumbsPane.classList.add("is-collapsed")
     } else {
       thumbsPane.classList.remove("is-collapsed")
@@ -121,7 +125,7 @@ async function initFlipbook(root) {
         pageFlip.flip(index)
       }
 
-      if (window.innerWidth <= 900) {
+      if (isCompactFlipbookViewport()) {
         thumbsPane.classList.add("is-collapsed")
       }
     })
@@ -147,6 +151,8 @@ async function initFlipbook(root) {
 
   initThumbObserver(root, thumbImages)
 
+  const isCompactViewport = isCompactFlipbookViewport()
+
   pageFlip = new window.St.PageFlip(book, {
     size: "stretch",
     minWidth: 198,
@@ -155,7 +161,7 @@ async function initFlipbook(root) {
     maxHeight: 1000,
     width: 707,
     height: 1000,
-    usePortrait: true,
+    usePortrait: isCompactViewport,
     autoSize: true,
     showCover: data.showCover !== false,
     mobileScrollSupport: false,
