@@ -3,12 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>
       {{ if .IsHome }}{{ site.Title | default .Title }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}
     </title>
     {{ hugo.Generator }}
 
-    {{ $styles := resources.Get "scss/flipbook/styles.scss" | css.Sass }}
+    {{ $styles := resources.Get "scss/flipbook/styles.scss" | resources.ExecuteAsTemplate "scss/flipbook/styles.scss" . | css.Sass }}
     {{ if hugo.IsProduction }}
       {{ $styles = $styles | minify | fingerprint }}
     {{ end }}
@@ -23,6 +26,8 @@
     <script src="{{ $js.RelPermalink }}" defer {{ if hugo.IsProduction }}integrity="{{ $js.Data.Integrity }}"{{ end }}></script>
   </head>
   <body>
+    {{ $footerCopyright := site.Params.footer.copyright | default (printf "© %d %s" now.Year site.Title) }}
+    {{ $footerBlurb := site.Params.footer.blurb | default site.Params.description }}
     <div class="site-shell">
       <header class="site-header">
         <a class="site-title" href="{{ site.Home.RelPermalink }}">{{ site.Title | default "Flipbook Library" }}</a>
@@ -30,6 +35,26 @@
       <main class="site-main">
         {{ block "main" . }}{{ end }}
       </main>
+      <footer class="site-footer">
+        <div class="site-footer-inner">
+          <div>
+            <p class="site-footer-title">{{ site.Title | default "Flipbook Library" }}</p>
+            {{ with $footerBlurb }}
+              <p class="site-footer-copy">{{ . }}</p>
+            {{ end }}
+          </div>
+          <div class="site-footer-meta">
+            {{ with site.Params.footer.links }}
+              <nav class="site-footer-links" aria-label="Footer">
+                {{ range . }}
+                  <a href="{{ .url }}">{{ .label }}</a>
+                {{ end }}
+              </nav>
+            {{ end }}
+            <p class="site-footer-copy">{{ $footerCopyright }}</p>
+          </div>
+        </div>
+      </footer>
     </div>
   </body>
 </html>
