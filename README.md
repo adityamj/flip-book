@@ -126,12 +126,18 @@ Add your real `page-000.jpg`, `pages/`, and `thumbs/` files to the issue folder.
 
 ## Sample Hugo Config
 
-A starter config is included at `hugo.toml`.
+A starter config is included at `hugo.toml`, and a reusable sample is included at `hugo.toml.example`.
 
 If you are running Hugo directly in this repo, you do not need a module import or theme setting. Just edit:
 
 - `baseURL`
 - `title`
+
+To start from the sample:
+
+```bash
+cp hugo.toml.example hugo.toml
+```
 
 If you later use this as a theme in another Hugo site:
 

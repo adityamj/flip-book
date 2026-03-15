@@ -194,7 +194,7 @@ img {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 320px));
   gap: 1.25rem;
-  justify-content: start;
+  justify-content: center;
 }
 
 .library-card {

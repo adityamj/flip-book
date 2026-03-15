@@ -1,0 +1,66 @@
+# Copy this file to `hugo.toml` and edit to suit your site.
+
+baseURL = "https://example.org/"
+title = "My Magazine Library"
+languageCode = "en-us"
+
+[outputs]
+  home = ["HTML"]
+  section = ["HTML"]
+  page = ["HTML", "JSON"]
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[params]
+  description = "A Hugo-powered library of magazine flipbooks."
+
+  [params.footer]
+    blurb = "Browse the archive online, open each issue as a flipbook, and read it comfortably on desktop or mobile."
+    copyright = "© 2025 Your Organization. All rights reserved."
+
+    [[params.footer.links]]
+      label = "Home"
+      url = "/"
+
+    [[params.footer.links]]
+      label = "Magazines"
+      url = "/magazines/"
+
+  [params.flipbook_theme]
+    bg = "#f5f0e7"
+    bg_strong = "#ece1d1"
+    panel = "#1e2730"
+    panel_soft = "#2d3945"
+    text = "#1d2430"
+    muted = "#6e7684"
+    card = "#fffaf2"
+    line = "rgba(29, 36, 48, 0.12)"
+    accent = "#c46a2d"
+    accent_soft = "#e9c7a9"
+    navy = "#24364a"
+    shadow = "rgba(34, 30, 22, 0.12)"
+    font_sans = "'Source Sans 3', 'Helvetica Neue', sans-serif"
+
+# Optional: use this repo as a local theme in another Hugo site.
+# theme = "flipbook"
+
+# Optional: if you publish this repo as a Hugo module, uncomment and replace:
+# [module]
+#   [[module.imports]]
+#     path = "github.com/<your-user-or-org>/flipbook"
+
+# Optional ideas you may want to add later:
+# [params.site]
+#   logo = "/images/logo.svg"
+#   favicon = "/images/favicon.png"
+#
+# [params.social]
+#   twitter = "https://twitter.com/your-handle"
+#   facebook = "https://facebook.com/your-page"
+#
+# [params.issue_defaults]
+#   thumb_panel_width = 160
+#   show_cover = true
