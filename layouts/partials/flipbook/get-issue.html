@@ -1,0 +1,40 @@
+{{ $images := .Resources.ByType "image" }}
+{{ $cover := false }}
+{{ $pages := slice }}
+{{ $items := slice }}
+
+{{ range $images }}
+  {{ if eq .Name "page-000.jpg" }}
+    {{ $cover = . }}
+  {{ else if eq .Name "page-000.jpeg" }}
+    {{ $cover = . }}
+  {{ else if or (hasPrefix .Name "pages/page-") (hasPrefix .Name "pages\\page-") }}
+    {{ $pages = $pages | append . }}
+  {{ end }}
+{{ end }}
+
+{{ $pages = sort $pages "Name" }}
+
+{{ with $cover }}
+  {{ $coverThumb := $.Resources.GetMatch "thumbs/page-000.*" }}
+  {{ if not $coverThumb }}
+    {{ $coverThumb = . }}
+  {{ end }}
+  {{ $items = $items | append (dict "number" 0 "label" "Cover" "page" . "thumb" $coverThumb) }}
+{{ end }}
+
+{{ range $pages }}
+  {{ $fileName := path.Base .Name }}
+  {{ $thumb := $.Resources.GetMatch (printf "thumbs/%s" $fileName) }}
+  {{ if not $thumb }}
+    {{ $thumb = . }}
+  {{ end }}
+  {{ $pageNumber := replaceRE `^page-([0-9]+)\.[^.]+$` `$1` $fileName }}
+  {{ $items = $items | append (dict "number" $pageNumber "label" (printf "Page %s" $pageNumber) "page" . "thumb" $thumb) }}
+{{ end }}
+
+{{ if and (not $cover) (gt (len $items) 0) }}
+  {{ $cover = (index $items 0).page }}
+{{ end }}
+
+{{ return (dict "cover" $cover "items" $items "count" (len $items)) }}

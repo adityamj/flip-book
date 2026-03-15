@@ -1,0 +1,21 @@
+{{ define "main" }}
+  <section class="library-header">
+    <p class="eyebrow">Magazines</p>
+    <h1>{{ .Title }}</h1>
+    {{ with .Content }}
+      <div class="library-copy">{{ . }}</div>
+    {{ else }}
+      {{ with .Description }}
+        <p class="library-copy">{{ . }}</p>
+      {{ end }}
+    {{ end }}
+  </section>
+
+  <section class="library-grid">
+    {{ range .Sections.ByTitle }}
+      {{ partial "flipbook/card.html" . }}
+    {{ else }}
+      <p class="empty-state">Add magazine sections under `content/magazines/` to populate the library.</p>
+    {{ end }}
+  </section>
+{{ end }}

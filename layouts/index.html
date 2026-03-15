@@ -1,0 +1,25 @@
+{{ define "main" }}
+  {{ $library := site.GetPage "section" "magazines" }}
+
+  <section class="library-header">
+    <p class="eyebrow">Library</p>
+    <h1>{{ .Title | default (site.Title | default "Flipbook Library") }}</h1>
+    {{ with .Content }}
+      <div class="library-copy">{{ . }}</div>
+    {{ else }}
+      <p class="library-copy">Browse every magazine, then open any issue as a flipbook.</p>
+    {{ end }}
+  </section>
+
+  <section class="library-grid">
+    {{ with $library }}
+      {{ range .Sections.ByWeight }}
+        {{ partial "flipbook/card.html" . }}
+      {{ else }}
+        <p class="empty-state">Add sections under `content/magazines/` to populate the library.</p>
+      {{ end }}
+    {{ else }}
+      <p class="empty-state">Create a `content/magazines/` section to start building the library.</p>
+    {{ end }}
+  </section>
+{{ end }}

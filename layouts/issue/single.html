@@ -1,0 +1,55 @@
+{{ define "head-custom" }}
+  <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+{{ end }}
+
+{{ define "main" }}
+  {{ $issue := partial "flipbook/get-issue.html" . }}
+  {{ $thumbPanelWidth := 160 }}
+  {{ with .Params.flipbook.thumb_panel_width }}
+    {{ $thumbPanelWidth = . }}
+  {{ end }}
+  {{ $jsonOutput := .OutputFormats.Get "json" }}
+
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="{{ site.Home.RelPermalink }}">Home</a>
+    {{ with .Parent }}
+      <span>/</span>
+      <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+    {{ end }}
+    <span>/</span>
+    <span>{{ .Title }}</span>
+  </nav>
+
+  <header class="issue-header">
+    <div>
+      <p class="eyebrow">Issue</p>
+      <h1>{{ .Title }}</h1>
+      {{ with .Description }}
+        <p class="issue-copy">{{ . }}</p>
+      {{ else }}
+        {{ with .Summary }}
+          <p class="issue-copy">{{ . }}</p>
+        {{ end }}
+      {{ end }}
+    </div>
+    <div class="issue-meta">
+      <span>{{ $issue.count }} pages</span>
+      {{ with .Date }}
+        <span>{{ .Format "Jan 2, 2006" }}</span>
+      {{ end }}
+    </div>
+  </header>
+
+  <section class="flipbook-shell" data-flipbook-root data-json-url="{{ with $jsonOutput }}{{ .RelPermalink }}{{ end }}" style="--thumb-panel-width: {{ $thumbPanelWidth }}px;">
+    <div class="flipbook-thumbs is-collapsed" data-thumbs></div>
+
+    <div class="flipbook-viewer">
+      <button class="thumb-toggle" type="button" aria-label="Toggle thumbnails" data-thumb-toggle>&#9776;</button>
+      <button class="fullscreen-toggle" type="button" aria-label="View in full screen" data-fullscreen-toggle>View in full screen</button>
+      <button class="nav-button nav-button-prev" type="button" aria-label="Previous page" data-prev>&#8249;</button>
+      <div class="flipbook-book" data-book></div>
+      <button class="nav-button nav-button-next" type="button" aria-label="Next page" data-next>&#8250;</button>
+    </div>
+
+  </section>
+{{ end }}

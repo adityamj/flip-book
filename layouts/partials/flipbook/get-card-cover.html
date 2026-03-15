@@ -1,0 +1,18 @@
+{{ $page := . }}
+{{ $cover := false }}
+
+{{ if eq $page.Type "issue" }}
+  {{ with partial "flipbook/get-issue.html" $page }}
+    {{ $cover = .cover }}
+  {{ end }}
+{{ else }}
+  {{ $issues := where $page.RegularPagesRecursive "Type" "issue" }}
+  {{ if gt (len $issues) 0 }}
+    {{ $candidate := index ($issues.ByDate.Reverse) 0 }}
+    {{ with partial "flipbook/get-issue.html" $candidate }}
+      {{ $cover = .cover }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ return $cover }}

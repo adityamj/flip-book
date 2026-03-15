@@ -1,0 +1,15 @@
+{{- $issue := partial "flipbook/get-issue.html" . -}}
+{{- $payload := slice -}}
+{{- range $issue.items -}}
+  {{- $payload = $payload | append (dict
+    "number" .number
+    "label" .label
+    "page" .page.RelPermalink
+    "thumb" .thumb.RelPermalink
+  ) -}}
+{{- end -}}
+{{- dict
+  "title" .Title
+  "showCover" (.Params.flipbook.show_cover | default true)
+  "items" $payload
+| jsonify -}}

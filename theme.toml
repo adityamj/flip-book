@@ -1,0 +1,11 @@
+name = "Flipbook"
+license = "MIT"
+licenselink = "https://opensource.org/licenses/MIT"
+description = "Hugo templates for a flipbook library with magazines and issue bundles."
+homepage = "https://example.org/"
+tags = ["hugo", "theme", "flipbook", "magazine", "issues"]
+features = ["page bundles", "flipbook viewer", "magazine issues", "lazy thumbnails"]
+min_version = "0.120.0"
+
+[author]
+  name = "OpenCode"

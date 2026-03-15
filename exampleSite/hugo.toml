@@ -1,0 +1,6 @@
+baseURL = "https://example.org/"
+title = "Flipbook Library"
+
+[module]
+  [[module.imports]]
+    path = "github.com/your-org/flipbook"

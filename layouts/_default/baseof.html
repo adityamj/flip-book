@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="{{ site.Language.LanguageCode | default `en` }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      {{ if .IsHome }}{{ site.Title | default .Title }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}
+    </title>
+    {{ hugo.Generator }}
+
+    {{ $styles := resources.Get "scss/flipbook/styles.scss" | css.Sass }}
+    {{ if hugo.IsProduction }}
+      {{ $styles = $styles | minify | fingerprint }}
+    {{ end }}
+    <link rel="stylesheet" href="{{ $styles.RelPermalink }}" {{ if hugo.IsProduction }}integrity="{{ $styles.Data.Integrity }}"{{ end }} />
+
+    {{ block "head-custom" . }}{{ end }}
+
+    {{ $js := resources.Get "js/flipbook/index.js" | js.Build (dict "target" "es2018" "minify" hugo.IsProduction) }}
+    {{ if hugo.IsProduction }}
+      {{ $js = $js | fingerprint }}
+    {{ end }}
+    <script src="{{ $js.RelPermalink }}" defer {{ if hugo.IsProduction }}integrity="{{ $js.Data.Integrity }}"{{ end }}></script>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="site-title" href="{{ site.Home.RelPermalink }}">{{ site.Title | default "Flipbook Library" }}</a>
+      </header>
+      <main class="site-main">
+        {{ block "main" . }}{{ end }}
+      </main>
+    </div>
+  </body>
+</html>

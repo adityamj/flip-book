@@ -1,0 +1,45 @@
+{{ $cover := partial "flipbook/get-card-cover.html" . }}
+{{ $issues := where .RegularPagesRecursive "Type" "issue" }}
+{{ $meta := "" }}
+{{ $detail := .Description }}
+
+{{ if eq .Type "issue" }}
+  {{ with partial "flipbook/get-issue.html" . }}
+    {{ $meta = printf "%d pages" .count }}
+  {{ end }}
+{{ else if gt (len $issues) 0 }}
+  {{ $sorted := $issues.ByDate }}
+  {{ $oldest := index $sorted 0 }}
+  {{ $latest := index ($sorted.Reverse) 0 }}
+  {{ $meta = printf "%d issues · %s-%s" (len $issues) ($oldest.Date.Format "Jan 2006") ($latest.Date.Format "Jan 2006") }}
+  {{ if not $detail }}
+    {{ $detail = printf "Browse %d issues from %s through %s." (len $issues) ($oldest.Date.Format "January 2006") ($latest.Date.Format "January 2006") }}
+  {{ end }}
+{{ end }}
+
+<article class="library-card">
+  <a class="library-card-link" href="{{ .RelPermalink }}">
+    <div class="library-card-media">
+      {{ with $cover }}
+        {{ $thumb := .Fit "480x680" }}
+        <img src="{{ $thumb.RelPermalink }}" alt="{{ $.Title }} cover" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" />
+      {{ else }}
+        <div class="library-card-placeholder">No cover yet</div>
+      {{ end }}
+    </div>
+    <div class="library-card-body">
+      <p class="library-card-kicker">{{ .Type | title }}</p>
+      <h2>{{ .Title }}</h2>
+      {{ with $detail }}
+        <p>{{ . }}</p>
+      {{ else }}
+        {{ with .Summary }}
+          <p>{{ . }}</p>
+        {{ end }}
+      {{ end }}
+      {{ with $meta }}
+        <span class="library-card-meta">{{ . }}</span>
+      {{ end }}
+    </div>
+  </a>
+</article>
