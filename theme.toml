@@ -1,6 +1,6 @@
 name = "Flipbook"
-license = "MIT"
-licenselink = "https://opensource.org/licenses/MIT"
+license = "BSD-3-Clause"
+licenselink = "https://opensource.org/license/bsd-3-clause"
 description = "Hugo templates for a flipbook library with magazines and issue bundles."
 homepage = "https://example.org/"
 tags = ["hugo", "theme", "flipbook", "magazine", "issues"]

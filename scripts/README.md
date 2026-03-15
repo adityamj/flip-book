@@ -26,7 +26,7 @@ Example:
 ```bash
 scripts/import-pdfs.sh \
   --source incoming \
-  --content-root exampleSite/content/magazines
+  --content-root content/magazines
 ```
 
 Single-magazine example:
@@ -34,7 +34,7 @@ Single-magazine example:
 ```bash
 scripts/import-pdfs.sh \
   --source incoming/example-magazine \
-  --content-root exampleSite/content/magazines
+  --content-root content/magazines
 ```
 
 Use more CPU cores during import:
@@ -42,7 +42,7 @@ Use more CPU cores during import:
 ```bash
 scripts/import-pdfs.sh \
   --source incoming \
-  --content-root exampleSite/content/magazines \
+  --content-root content/magazines \
   --dpi 300 \
   --jobs 8
 ```
@@ -50,7 +50,7 @@ scripts/import-pdfs.sh \
 This creates issue bundles like:
 
 ```text
-exampleSite/content/magazines/example-magazine/issue-01/
+content/magazines/example-magazine/issue-01/
   index.md
   page-000.jpg
   pages/page-001.jpg

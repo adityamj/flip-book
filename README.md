@@ -2,7 +2,7 @@
 
 `flip-book` is a Hugo theme for publishing magazine archives as browser-based flipbooks.
 
-This theme is released under the MIT License. See `LICENSE`.
+This theme is released under the BSD 3-Clause License. See `LICENSE`.
 
 It is built for a simple content model:
 
@@ -11,6 +11,10 @@ It is built for a simple content model:
 - each issue is a page bundle rendered as a flipbook
 
 The theme uses `page-000.jpg` as the issue cover and first page, renders the rest of the pages from `pages/`, uses `thumbs/` when available, and serves issue data as JSON for the frontend reader.
+
+## Demo
+
+This theme was built to enable https://fdmse.drasha.in/e-publications/ which also serves as a live demo.
 
 ## Content Model
 
@@ -270,13 +274,9 @@ make compress JOBS=8
 make deploy RSYNC_DEST=user@host:/var/www/site/ RSYNC_OPTS='-avz --delete'
 ```
 
-## Example Site
-
-See `exampleSite/` for a minimal working content tree and starter config.
-
 ## License
 
-This theme is licensed under the MIT License.
+This theme is licensed under the BSD 3-Clause License.
 
 Third-party dependencies and externally loaded assets, including `page-flip` and `Source Sans 3`, are licensed by their respective authors under their own terms.
 
