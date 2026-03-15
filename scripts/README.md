@@ -6,17 +6,17 @@ Expected source layout:
 
 ```text
 incoming/
-  gyan-vahini/
+  magazine-one/
     Issue 01.pdf
     Issue 02.pdf
-  sehat-sandesh/
+  magazine-two/
     Launch Edition.pdf
 ```
 
 It also supports a single magazine folder with PDFs directly inside:
 
 ```text
-incoming/gyan-vahini/
+incoming/example-magazine/
   Issue 01.pdf
   Issue 02.pdf
 ```
@@ -33,7 +33,7 @@ Single-magazine example:
 
 ```bash
 scripts/import-pdfs.sh \
-  --source incoming/gyan-vahini \
+  --source incoming/example-magazine \
   --content-root exampleSite/content/magazines
 ```
 
@@ -50,7 +50,7 @@ scripts/import-pdfs.sh \
 This creates issue bundles like:
 
 ```text
-exampleSite/content/magazines/gyan-vahini/issue-01/
+exampleSite/content/magazines/example-magazine/issue-01/
   index.md
   page-000.jpg
   pages/page-001.jpg

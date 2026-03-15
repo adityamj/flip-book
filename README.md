@@ -2,6 +2,8 @@
 
 `flip-book` is a Hugo theme for publishing magazine archives as browser-based flipbooks.
 
+This theme is released under the MIT License. See `LICENSE`.
+
 It is built for a simple content model:
 
 - multiple magazines
@@ -16,9 +18,9 @@ The theme uses `page-000.jpg` as the issue cover and first page, renders the res
 content/
   magazines/
     _index.md
-    gyan-vahini/
+    example-magazine/
       _index.md
-      gyan-vahini-01-cancer-cervix-jan-25/
+      issue-2025-01/
         index.md
         page-000.jpg
         pages/
@@ -34,8 +36,8 @@ Routes:
 
 - `/` -> library home
 - `/magazines/` -> all magazines
-- `/magazines/gyan-vahini/` -> all issues for that magazine
-- `/magazines/gyan-vahini/gyan-vahini-01-cancer-cervix-jan-25/` -> issue reader
+- `/magazines/example-magazine/` -> all issues for that magazine
+- `/magazines/example-magazine/issue-2025-01/` -> issue reader
 
 ## File Conventions
 
@@ -59,6 +61,20 @@ The reader assumes A4-derived page images.
 - mobile thumbnail drawer
 - fullscreen reading mode
 - configurable colors, typography, footer, and metadata
+
+## Upstream Open Source Projects
+
+`flip-book` builds on a small set of upstream open source projects and hosted assets:
+
+- `Hugo` - the static site generator used to build the theme, templates, asset pipeline, and output formats
+- `StPageFlip` / `page-flip` - the browser flipbook engine used by the issue reader; loaded from jsDelivr in `layouts/issue/single.html`
+- `Source Sans 3` - the default typeface referenced from Google Fonts in `layouts/_default/baseof.html`
+
+Notes:
+
+- this theme's own templates, SCSS, and JavaScript are maintained in this repository
+- third-party projects keep their own licenses and notices
+- if you vendor or redistribute third-party assets locally, review the upstream repositories and license texts before shipping
 
 ## Installation
 
@@ -97,7 +113,7 @@ Magazine section:
 
 ```yaml
 ---
-title: "Gyan Vahini"
+title: "Example Magazine"
 type: "magazine"
 description: "A magazine with multiple issues rendered as flipbooks."
 ---
@@ -167,8 +183,8 @@ Configure footer content from `hugo.toml`:
 Create content with:
 
 ```bash
-hugo new magazines/gyan-vahini/_index.md
-hugo new magazines/gyan-vahini/issue-2026-01/index.md
+hugo new magazines/example-magazine/_index.md
+hugo new magazines/example-magazine/issue-2026-01/index.md
 ```
 
 Then place `page-000.jpg`, `pages/`, and optional `thumbs/` into that issue bundle.
@@ -181,10 +197,10 @@ Input mode A: one subdirectory per magazine
 
 ```text
 incoming/
-  gyan-vahini/
+  magazine-one/
     Issue 01.pdf
     Issue 02.pdf
-  sehat-sandesh/
+  magazine-two/
     Launch Edition.pdf
 ```
 
@@ -197,14 +213,14 @@ scripts/import-pdfs.sh \
 Input mode B: one magazine folder with PDFs directly inside
 
 ```text
-incoming/gyan-vahini/
+incoming/example-magazine/
   Issue 01.pdf
   Issue 02.pdf
 ```
 
 ```bash
 scripts/import-pdfs.sh \
-  --source incoming/gyan-vahini \
+  --source incoming/example-magazine \
   --content-root content/magazines
 ```
 
@@ -257,6 +273,12 @@ make deploy RSYNC_DEST=user@host:/var/www/site/ RSYNC_OPTS='-avz --delete'
 ## Example Site
 
 See `exampleSite/` for a minimal working content tree and starter config.
+
+## License
+
+This theme is licensed under the MIT License.
+
+Third-party dependencies and externally loaded assets, including `page-flip` and `Source Sans 3`, are licensed by their respective authors under their own terms.
 
 ## Notes
 
