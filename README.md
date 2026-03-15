@@ -161,6 +161,18 @@ Example:
   font_sans = "'Source Sans 3', 'Helvetica Neue', sans-serif"
 ```
 
+## Analytics
+
+Enable Google Analytics 4 by setting your Google tag ID in `hugo.toml`:
+
+```toml
+[services]
+  [services.googleAnalytics]
+    id = "G-MEASUREMENT_ID"
+```
+
+The theme uses Hugo's embedded `google_analytics.html` partial, so Hugo handles the GA4 script output and privacy settings. The tracking script is only emitted for production builds when an ID is configured.
+
 ## Footer and Site Metadata
 
 Configure footer content from `hugo.toml`:

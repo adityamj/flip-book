@@ -22,6 +22,10 @@ languageCode = "en-us"
     [markup.goldmark.renderer]
       unsafe = true
 
+[services]
+  [services.googleAnalytics]
+    id = ""
+
 [params]
   description = "A Hugo-powered library of magazine flipbooks."
 
