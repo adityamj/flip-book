@@ -51,9 +51,6 @@
       {{ $js = $js | fingerprint }}
     {{ end }}
     <script src="{{ $js.RelPermalink }}" defer {{ if hugo.IsProduction }}integrity="{{ $js.Data.Integrity }}"{{ end }}></script>
-    {{ if and hugo.IsProduction site.Config.Services.GoogleAnalytics.ID }}
-      {{ partial "google_analytics.html" . }}
-    {{ end }}
   </head>
   <body class="{{ if eq .Type `issue` }}page-issue{{ else if .IsHome }}page-home{{ else }}page-default{{ end }}">
     {{ $footerCopyright := site.Params.footer.copyright | default (printf "© %d %s" now.Year site.Title) }}
@@ -86,5 +83,8 @@
         </div>
       </footer>
     </div>
+    {{ if and hugo.IsProduction site.Config.Services.GoogleAnalytics.ID }}
+      {{ partial "google_analytics.html" . }}
+    {{ end }}
   </body>
 </html>

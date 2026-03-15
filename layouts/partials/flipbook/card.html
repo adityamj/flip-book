@@ -1,12 +1,20 @@
-{{ $cover := partial "flipbook/get-card-cover.html" . }}
-{{ $issues := where .RegularPagesRecursive "Type" "issue" }}
+{{ $page := . }}
+{{ $isLCP := false }}
+{{ with .page }}
+  {{ $page = . }}
+{{ end }}
+{{ with .isLCP }}
+  {{ $isLCP = . }}
+{{ end }}
+{{ $cover := partial "flipbook/get-card-cover.html" $page }}
+{{ $issues := where $page.RegularPagesRecursive "Type" "issue" }}
 {{ $meta := "" }}
-{{ $detail := .Description }}
+{{ $detail := $page.Description }}
 {{ $cta := "Open issue" }}
 {{ $badge := "" }}
 
-{{ if eq .Type "issue" }}
-  {{ with partial "flipbook/get-issue.html" . }}
+{{ if eq $page.Type "issue" }}
+  {{ with partial "flipbook/get-issue.html" $page }}
     {{ $meta = printf "%d pages" .count }}
   {{ end }}
 {{ else if gt (len $issues) 0 }}
@@ -22,25 +30,25 @@
 {{ end }}
 
 <article class="library-card">
-  <a class="library-card-link" href="{{ .RelPermalink }}">
+  <a class="library-card-link" href="{{ $page.RelPermalink }}">
     <div class="library-card-media">
       {{ with $badge }}
         <span class="library-card-badge">{{ . }}</span>
       {{ end }}
       {{ with $cover }}
         {{ $thumb := .Fit "480x680" }}
-        <img src="{{ $thumb.RelPermalink }}" alt="{{ $.Title }} cover" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" />
+        <img src="{{ $thumb.RelPermalink }}" alt="{{ $page.Title }} cover" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" {{ if $isLCP }}fetchpriority="high"{{ end }} />
       {{ else }}
         <div class="library-card-placeholder">No cover yet</div>
       {{ end }}
     </div>
     <div class="library-card-body">
-      <p class="library-card-kicker">{{ .Type | title }}</p>
-      <h2>{{ .Title }}</h2>
+      <p class="library-card-kicker">{{ $page.Type | title }}</p>
+      <h2>{{ $page.Title }}</h2>
       {{ with $detail }}
         <p>{{ . }}</p>
       {{ else }}
-        {{ with .Summary }}
+        {{ with $page.Summary }}
           <p>{{ . }}</p>
         {{ end }}
       {{ end }}

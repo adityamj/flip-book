@@ -12,8 +12,8 @@
   </section>
 
   <section class="library-grid">
-    {{ range .Sections.ByTitle }}
-      {{ partial "flipbook/card.html" . }}
+    {{ range $index, $section := .Sections.ByTitle }}
+      {{ partial "flipbook/card.html" (dict "page" $section "isLCP" (eq $index 0)) }}
     {{ else }}
       <p class="empty-state">Add magazine sections under `content/magazines/` to populate the library.</p>
     {{ end }}

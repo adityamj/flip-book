@@ -18,8 +18,8 @@
   </section>
 
   <section class="library-grid">
-    {{ range .RegularPages.ByDate.Reverse }}
-      {{ partial "flipbook/card.html" . }}
+    {{ range $index, $issue := .RegularPages.ByDate.Reverse }}
+      {{ partial "flipbook/card.html" (dict "page" $issue "isLCP" (eq $index 0)) }}
     {{ else }}
       <p class="empty-state">Add issue bundles under this magazine to publish the first issue.</p>
     {{ end }}

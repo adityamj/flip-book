@@ -17,8 +17,8 @@
 
   <section class="library-grid library-grid-magazines">
     {{ with $library }}
-      {{ range $magazines }}
-        {{ partial "flipbook/card.html" . }}
+      {{ range $index, $magazine := $magazines }}
+        {{ partial "flipbook/card.html" (dict "page" $magazine "isLCP" (eq $index 0)) }}
       {{ else }}
         <p class="empty-state">Add sections under `content/magazines/` to populate the library.</p>
       {{ end }}

@@ -120,7 +120,7 @@ img {
 
 .site-footer-copy {
   margin: 0;
-  color: $muted;
+  color: mix($text, $muted, 44%);
   font-size: 0.95rem;
   line-height: 1.6;
 }
@@ -153,7 +153,7 @@ img {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  color: $muted;
+  color: mix($text, $muted, 48%);
   font-size: 0.92rem;
   margin-bottom: 1.5rem;
 }
@@ -189,7 +189,7 @@ img {
 .library-copy,
 .issue-copy {
   max-width: 60ch;
-  color: $muted;
+  color: mix($text, $muted, 42%);
   font-size: 1.05rem;
   line-height: 1.7;
 }
@@ -324,7 +324,7 @@ img {
 .recent-issue-date,
 .recent-issue-meta {
   margin: 0;
-  color: $muted;
+  color: mix($text, $muted, 58%);
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -340,7 +340,7 @@ img {
 
 .recent-issue-copy {
   margin: 0;
-  color: $muted;
+  color: mix($text, $muted, 42%);
   font-size: 0.92rem;
   line-height: 1.45;
   display: -webkit-box;
@@ -408,7 +408,7 @@ img {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  color: #6d6f77;
+  color: mix($text, $muted, 48%);
   font-size: 0.95rem;
 }
 
@@ -419,7 +419,7 @@ img {
 .library-card-kicker,
 .library-card-meta {
   margin: 0;
-  color: $muted;
+  color: mix($text, $muted, 58%);
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -471,7 +471,7 @@ img {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  color: $muted;
+  color: mix($text, $muted, 48%);
   text-align: right;
   white-space: nowrap;
 }
@@ -482,7 +482,7 @@ img {
   border-radius: 16px;
   background: rgba(255, 250, 242, 0.72);
   border: 1px solid rgba(29, 36, 48, 0.08);
-  color: $muted;
+  color: mix($text, $muted, 46%);
 }
 
 .flipbook-shell {
@@ -562,7 +562,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $muted;
+  color: mix($text, $muted, 46%);
 }
 
 .flipbook-page {
