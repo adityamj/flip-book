@@ -221,8 +221,24 @@ img {
 }
 
 .library-card-media {
+  position: relative;
   background: linear-gradient(180deg, #f0e2d0 0%, #e6d5c0 100%);
   aspect-ratio: 210 / 297;
+}
+
+.library-card-badge {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  z-index: 2;
+  padding: 0.42rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(36, 54, 74, 0.9);
+  color: #fffaf2;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .library-card-media img,
@@ -269,6 +285,25 @@ img {
 .library-card-body p {
   margin: 0 0 0.8rem;
   line-height: 1.5;
+}
+
+.library-card-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.35rem;
+  padding: 0.72rem 0.95rem;
+  border-radius: 999px;
+  background: rgba(196, 106, 45, 0.12);
+  color: $navy;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.library-card-link:hover .library-card-cta {
+  background: rgba(196, 106, 45, 0.2);
+  color: $accent;
 }
 
 .issue-header {

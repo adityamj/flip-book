@@ -1,16 +1,16 @@
-# Flipbook for Hugo
+# Flip Book
 
-This repo provides a Hugo-ready flipbook setup for a simple publishing model:
+`flip-book` is a Hugo theme for publishing magazine archives as browser-based flipbooks.
+
+It is built for a simple content model:
 
 - multiple magazines
 - each magazine has multiple issues
-- each issue opens as a flipbook
+- each issue is a page bundle rendered as a flipbook
 
-`page-000.jpg` is used as the issue cover and also becomes the first page in the book.
+The theme uses `page-000.jpg` as the issue cover and first page, renders the rest of the pages from `pages/`, uses `thumbs/` when available, and serves issue data as JSON for the frontend reader.
 
 ## Content Model
-
-Use one section for all magazines:
 
 ```text
 content/
@@ -30,37 +30,70 @@ content/
           page-002.jpg
 ```
 
-Routes then become:
+Routes:
 
 - `/` -> library home
 - `/magazines/` -> all magazines
 - `/magazines/gyan-vahini/` -> all issues for that magazine
-- `/magazines/gyan-vahini/gyan-vahini-01-cancer-cervix-jan-25/` -> flipbook
+- `/magazines/gyan-vahini/gyan-vahini-01-cancer-cervix-jan-25/` -> issue reader
 
-## Naming Conventions
+## File Conventions
 
 - `page-000.jpg` = cover page
-- `pages/page-001.jpg`, `pages/page-002.jpg`, ... = inside pages
+- `pages/page-001.jpg`, `pages/page-002.jpg`, ... = inner pages
 - `thumbs/page-000.jpg`, `thumbs/page-001.jpg`, ... = optional thumbnails
-- if a thumb is missing, the full-size image is used as a fallback
+- if a thumb is missing, the page image is used as fallback
 
-The layout assumes A4-derived pages.
+The reader assumes A4-derived page images.
 
-## Hugo Files Included
+## Theme Features
 
-- `layouts/index.html` for the home page
-- `layouts/magazines/list.html` for the magazine directory
-- `layouts/magazine/list.html` for one magazine's issue list
-- `layouts/issue/single.html` for the flipbook page
-- `layouts/partials/flipbook/` helpers for issue resources and cards
-- `assets/js/flipbook/index.js` for the interactive viewer
-- `assets/scss/flipbook/styles.scss` for styling
-- `archetypes/magazine.md` and `archetypes/issue.md`
-- `exampleSite/` with a sample content tree
+- magazine index and issue index templates
+- JSON-backed issue payloads
+- PageFlip-based reader
+- lazy-loaded thumbnails
+- progressive nearby page loading
+- desktop arrows
+- keyboard arrow navigation
+- mobile swipe support
+- mobile thumbnail drawer
+- fullscreen reading mode
+- configurable colors, typography, footer, and metadata
+
+## Installation
+
+Use it as a Hugo theme in your site.
+
+1. Add the theme under `themes/flip-book`
+2. Set this in your site's `hugo.toml`:
+
+```toml
+theme = "flip-book"
+```
+
+You can also use this repo directly as a Hugo site for local development.
+
+## Sample Config
+
+A reusable sample config is included at `hugo.toml.example`.
+
+Typical start:
+
+```bash
+cp hugo.toml.example hugo.toml
+```
+
+Then edit at least:
+
+- `baseURL`
+- `title`
+- `theme`
+
+Text minification is enabled in the sample config via Hugo's `[minify]` settings.
 
 ## Front Matter
 
-Magazine section `content/magazines/gyan-vahini/_index.md`:
+Magazine section:
 
 ```yaml
 ---
@@ -70,12 +103,12 @@ description: "A magazine with multiple issues rendered as flipbooks."
 ---
 ```
 
-Issue bundle `content/magazines/gyan-vahini/gyan-vahini-01/index.md`:
+Issue bundle:
 
 ```yaml
 ---
 title: "Issue 01"
-date: 2026-01-01
+date: 2025-01-01
 type: "issue"
 description: "January issue"
 
@@ -85,71 +118,9 @@ flipbook:
 ---
 ```
 
-## Viewer Behavior
-
-For each issue bundle, Hugo:
-
-- reads `page-000.jpg` as the cover
-- reads and sorts `pages/page-*.jpg`
-- pairs each page with `thumbs/page-*.jpg` when present
-- emits an issue JSON payload alongside the HTML page
-- fetches that JSON in the browser and initializes `page-flip`
-
-Features:
-
-- cover page support from `page-000.jpg`
-- lazy-loaded thumbnails
-- progressive loading of nearby full pages
-- desktop side arrows
-- keyboard arrow navigation
-- mobile swipe support
-- mobile hamburger drawer for thumbnails
-
-## Example Site
-
-See `exampleSite/` for a minimal sample:
-
-```text
-exampleSite/
-  hugo.toml
-  content/
-    _index.md
-    magazines/
-      _index.md
-      gyan-vahini/
-        _index.md
-        issue-2026-01/
-          index.md
-```
-
-Add your real `page-000.jpg`, `pages/`, and `thumbs/` files to the issue folder.
-
-## Sample Hugo Config
-
-A starter config is included at `hugo.toml`, and a reusable sample is included at `hugo.toml.example`.
-
-If you are running Hugo directly in this repo, you do not need a module import or theme setting. Just edit:
-
-- `baseURL`
-- `title`
-
-To start from the sample:
-
-```bash
-cp hugo.toml.example hugo.toml
-```
-
-If you later use this as a theme in another Hugo site:
-
-```toml
-theme = "flipbook"
-```
-
-If you later publish/use it as a Hugo module, replace the placeholder path in the commented module section with the real module path.
-
 ## Theme Customization
 
-The color system is configurable from `hugo.toml` under `[params.flipbook_theme]`.
+Theme colors and fonts are configurable from `hugo.toml` under `[params.flipbook_theme]`.
 
 Example:
 
@@ -170,13 +141,9 @@ Example:
   font_sans = "'Source Sans 3', 'Helvetica Neue', sans-serif"
 ```
 
-This lets you reuse the theme with a different palette without editing the SCSS directly.
-
 ## Footer and Site Metadata
 
-You can configure the footer from `hugo.toml`.
-
-Example:
+Configure footer content from `hugo.toml`:
 
 ```toml
 [params]
@@ -195,26 +162,20 @@ Example:
       url = "/magazines/"
 ```
 
-Good candidates to customize here are:
-
-- site description
-- copyright text
-- footer navigation links
-
 ## Archetypes
 
-Create a magazine and issue with:
+Create content with:
 
 ```bash
 hugo new magazines/gyan-vahini/_index.md
 hugo new magazines/gyan-vahini/issue-2026-01/index.md
 ```
 
-Then add the images into that issue bundle.
+Then place `page-000.jpg`, `pages/`, and optional `thumbs/` into that issue bundle.
 
-## PDF Import Helper
+## Importing PDFs
 
-If you already have PDFs, use `scripts/import-pdfs.sh`.
+If you already have magazine PDFs, use `scripts/import-pdfs.sh`.
 
 Input mode A: one subdirectory per magazine
 
@@ -227,22 +188,10 @@ incoming/
     Launch Edition.pdf
 ```
 
-Run:
-
 ```bash
 scripts/import-pdfs.sh \
   --source incoming \
-  --content-root exampleSite/content/magazines
-```
-
-To use more CPU cores for high-DPI imports:
-
-```bash
-scripts/import-pdfs.sh \
-  --source incoming \
-  --content-root exampleSite/content/magazines \
-  --dpi 300 \
-  --jobs 8
+  --content-root content/magazines
 ```
 
 Input mode B: one magazine folder with PDFs directly inside
@@ -253,12 +202,10 @@ incoming/gyan-vahini/
   Issue 02.pdf
 ```
 
-Run:
-
 ```bash
 scripts/import-pdfs.sh \
   --source incoming/gyan-vahini \
-  --content-root exampleSite/content/magazines
+  --content-root content/magazines
 ```
 
 What it does:
@@ -267,63 +214,52 @@ What it does:
 - creates one issue bundle per PDF using the PDF filename as the issue slug
 - renders the first PDF page as `page-000.jpg`
 - renders remaining pages as `pages/page-001.jpg`, `pages/page-002.jpg`, ...
-- creates progressive JPEGs for both pages and matching `thumbs/` images
-- skips issues that are already processed unless `--force` is used
+- creates progressive JPEGs for both pages and thumbs
+- skips existing issues unless `--force` is used
+- supports `--overwrite-jpgs` to rebuild only JPG assets without touching Markdown
 
 Performance tips:
 
-- the importer defaults to `--dpi 120` for faster conversion
-- for quick checks, try `--dpi 100`
-- use `--jobs N` to parallelize page rendering and thumbnail generation
-- increase DPI only when you need higher page fidelity
+- default render DPI is `120`
+- use `--dpi 300` for higher fidelity
+- use `--jobs N` to parallelize rendering and thumbnail generation
 
 See `scripts/README.md` for more details.
 
-## Standalone Static Viewer
+## Build and Deploy
 
-The original static `index.html` flow still works.
-
-Requirements:
-
-- `pdftoppm` from `poppler-utils`
-- `mogrify` from `imagemagick`
-
-Ubuntu/Debian:
+The Makefile is oriented around Hugo build, compression, and rsync deployment.
 
 ```bash
-sudo apt install poppler-utils imagemagick
+make build
+make compress
+make deploy RSYNC_DEST=user@host:/var/www/site/
+make publish RSYNC_DEST=user@host:/var/www/site/
+make clean
 ```
 
-Generate pages and thumbs in the repo root:
+What they do:
+
+- `make build` builds the Hugo site with minification enabled
+- `make compress` creates `.gz`, `.zst`, and `.br` files for text outputs in `public/`
+- `make deploy` uploads `public/` with `rsync`
+- `make publish` runs build, compress, and deploy in one go
+- `make clean` removes the generated `public/` directory
+
+Useful variables:
 
 ```bash
-make PDF=magazine.pdf
+make build CONFIG=hugo.toml
+make compress JOBS=8
+make deploy RSYNC_DEST=user@host:/var/www/site/ RSYNC_OPTS='-avz --delete'
 ```
 
-Serve locally:
+## Example Site
 
-```bash
-python3 -m http.server 8080
-```
-
-Then open:
-
-```text
-http://localhost:8080/index.html
-```
-
-## Make Targets
-
-```bash
-make                 # build pages, thumbnails, and pagecount.txt
-make PDF=issue.pdf   # build from a different PDF
-make clean           # remove generated pages, thumbs, and pagecount.txt
-```
+See `exampleSite/` for a minimal working content tree and starter config.
 
 ## Notes
 
-- Hugo mode does not need `pagecount.txt`
-- standalone mode still uses `pagecount.txt`
-- filenames are expected in zero-padded form such as `page-000.jpg` and `page-001.jpg`
-- the Hugo implementation uses the `page-flip` browser build from jsDelivr
-- issue pages also publish a JSON representation used by the frontend viewer
+- issue pages publish both HTML and JSON outputs
+- the frontend reader uses the `page-flip` browser build from jsDelivr
+- the theme expects zero-padded filenames such as `page-000.jpg` and `page-001.jpg`

@@ -2,6 +2,8 @@
 {{ $issues := where .RegularPagesRecursive "Type" "issue" }}
 {{ $meta := "" }}
 {{ $detail := .Description }}
+{{ $cta := "Open issue" }}
+{{ $badge := "" }}
 
 {{ if eq .Type "issue" }}
   {{ with partial "flipbook/get-issue.html" . }}
@@ -12,6 +14,8 @@
   {{ $oldest := index $sorted 0 }}
   {{ $latest := index ($sorted.Reverse) 0 }}
   {{ $meta = printf "%d issues · %s-%s" (len $issues) ($oldest.Date.Format "Jan 2006") ($latest.Date.Format "Jan 2006") }}
+  {{ $badge = printf "%d Issues" (len $issues) }}
+  {{ $cta = "View all issues" }}
   {{ if not $detail }}
     {{ $detail = printf "Browse %d issues from %s through %s." (len $issues) ($oldest.Date.Format "January 2006") ($latest.Date.Format "January 2006") }}
   {{ end }}
@@ -20,6 +24,9 @@
 <article class="library-card">
   <a class="library-card-link" href="{{ .RelPermalink }}">
     <div class="library-card-media">
+      {{ with $badge }}
+        <span class="library-card-badge">{{ . }}</span>
+      {{ end }}
       {{ with $cover }}
         {{ $thumb := .Fit "480x680" }}
         <img src="{{ $thumb.RelPermalink }}" alt="{{ $.Title }} cover" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" />
@@ -40,6 +47,7 @@
       {{ with $meta }}
         <span class="library-card-meta">{{ . }}</span>
       {{ end }}
+      <span class="library-card-cta">{{ $cta }}</span>
     </div>
   </a>
 </article>

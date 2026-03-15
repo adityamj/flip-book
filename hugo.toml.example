@@ -9,6 +9,14 @@ languageCode = "en-us"
   section = ["HTML"]
   page = ["HTML", "JSON"]
 
+[minify]
+  disableCSS = false
+  disableHTML = false
+  disableJS = false
+  disableJSON = false
+  disableSVG = false
+  disableXML = false
+
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
