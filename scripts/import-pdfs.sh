@@ -6,6 +6,7 @@ usage() {
   cat <<'EOF'
 Usage:
   scripts/import-pdfs.sh --source DIR [options]
+  scripts/import-pdfs.sh --pdf FILE [options]
 
 Input mode A: one subdirectory per magazine
   DIR/
@@ -32,6 +33,7 @@ Output structure:
 
 Options:
   --source DIR          Root directory with magazine subdirectories or PDFs directly.
+  --pdf FILE            Import a single PDF file.
   --magazine SLUG       Magazine slug when SOURCE_DIR contains PDFs directly.
   --magazine-title TXT  Magazine title when SOURCE_DIR contains PDFs directly.
   --content-root DIR    Hugo content root for magazine output.
@@ -48,6 +50,7 @@ Notes:
   - The first PDF page becomes page-000.jpg and is used as the cover.
   - Remaining pages become pages/page-001.jpg, pages/page-002.jpg, ...
   - Matching thumbs are created in thumbs/.
+  - Single-PDF imports derive magazine metadata from the PDF parent directory unless overridden.
   - Existing processed issues are skipped unless --force is used.
   - --overwrite-jpgs rebuilds only JPG assets and preserves existing markdown files.
 EOF
@@ -126,6 +129,13 @@ is_processed_issue() {
   [ -f "$issue_dir/page-000.jpg" ] && [ -d "$issue_dir/pages" ] && [ -d "$issue_dir/thumbs" ]
 }
 
+clean_issue_jpgs() {
+  issue_dir="$1"
+
+  rm -rf "$issue_dir/pages" "$issue_dir/thumbs"
+  rm -f "$issue_dir/page-000.jpg"
+}
+
 process_pdf() {
   pdf_path="$1"
   magazine_dir="$2"
@@ -155,8 +165,7 @@ process_pdf() {
 
   if [ "$OVERWRITE_JPGS" = "1" ]; then
     mkdir -p "$issue_dir"
-    rm -rf "$issue_dir/pages" "$issue_dir/thumbs"
-    rm -f "$issue_dir/page-000.jpg"
+    clean_issue_jpgs "$issue_dir"
   else
     rm -rf "$issue_dir"
   fi
@@ -244,6 +253,7 @@ process_pdf() {
 }
 
 SOURCE_DIR=""
+PDF_PATH=""
 MAGAZINE_SLUG=""
 MAGAZINE_TITLE=""
 CONTENT_ROOT="content/magazines"
@@ -257,6 +267,10 @@ while [ "$#" -gt 0 ]; do
   case "$1" in
     --source)
       SOURCE_DIR="$2"
+      shift 2
+      ;;
+    --pdf)
+      PDF_PATH="$2"
       shift 2
       ;;
     --magazine)
@@ -303,7 +317,12 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-if [ -z "$SOURCE_DIR" ]; then
+if [ -n "$SOURCE_DIR" ] && [ -n "$PDF_PATH" ]; then
+  printf 'Use either --source or --pdf, not both\n' >&2
+  exit 1
+fi
+
+if [ -z "$SOURCE_DIR" ] && [ -z "$PDF_PATH" ]; then
   usage >&2
   exit 1
 fi
@@ -329,8 +348,13 @@ if [ "$JOBS" -le 0 ]; then
   exit 1
 fi
 
-if [ ! -d "$SOURCE_DIR" ]; then
+if [ -n "$SOURCE_DIR" ] && [ ! -d "$SOURCE_DIR" ]; then
   printf 'Source directory not found: %s\n' "$SOURCE_DIR" >&2
+  exit 1
+fi
+
+if [ -n "$PDF_PATH" ] && [ ! -f "$PDF_PATH" ]; then
+  printf 'PDF not found: %s\n' "$PDF_PATH" >&2
   exit 1
 fi
 
@@ -339,6 +363,29 @@ mkdir -p "$CONTENT_ROOT"
 processed_count=0
 skipped_count=0
 found_magazine_dirs=0
+
+if [ -n "$PDF_PATH" ]; then
+  if [ -z "$MAGAZINE_SLUG" ]; then
+    MAGAZINE_SLUG="$(slugify "$(basename "$(dirname "$PDF_PATH")")")"
+  fi
+
+  if [ -z "$MAGAZINE_TITLE" ]; then
+    MAGAZINE_TITLE="$(human_title "$(basename "$(dirname "$PDF_PATH")")")"
+  fi
+
+  if [ -z "$MAGAZINE_SLUG" ]; then
+    printf 'Could not derive magazine slug from PDF path: %s\n' "$PDF_PATH" >&2
+    exit 1
+  fi
+
+  magazine_out_dir="$CONTENT_ROOT/$MAGAZINE_SLUG"
+  mkdir -p "$magazine_out_dir"
+  create_section_index "$magazine_out_dir/_index.md" "$MAGAZINE_TITLE"
+  process_pdf "$PDF_PATH" "$magazine_out_dir"
+
+  printf '\nDone. Processed: %s, skipped: %s\n' "$processed_count" "$skipped_count"
+  exit 0
+fi
 
 top_dir_list="$(mktemp)"
 trap 'rm -f "$top_dir_list"' EXIT INT TERM
